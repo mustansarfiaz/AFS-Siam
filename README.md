@@ -1,6 +1,8 @@
-# SCS-Siam PyTorch implementation
+# AFS-Siam PyTorch implementation
 ## Introduction
 This is my project in the direction of Visual Object Tracking.
+
+Paper: Adaptive Feature Selection Siamese Networks for Visual Tracking
 
 **SCS-Siam architecture**
 ![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS.pdf)
