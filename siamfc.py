@@ -15,9 +15,41 @@ from got10k.trackers import Tracker
 
 class SiamFC(nn.Module):
 
-    def __init__(self,features=256,  M=3, G=8, r=2, L=32):
+    def __init__(self,img_ch=256,features=256, channel=768, WH=6, M=3, G=8, r=2, L=32):
         super(SiamFC, self).__init__()
 
+
+        self.feature1 = nn.Sequential(
+            # conv1
+            nn.Conv2d(3, 192, 11, 2),
+            nn.BatchNorm2d(192, eps=1e-6, momentum=0.05),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(3, 2))
+
+        self.feature2 = nn.Sequential(
+            # conv1
+            nn.Conv2d(3, 192, 11, 2),
+            nn.BatchNorm2d(192, eps=1e-6, momentum=0.05),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(3, 2))
+
+        self.feature3 = nn.Sequential(
+            # conv2
+            nn.Conv2d(192, 256, 3, 1),
+            nn.Conv2d(256, 256, 3, 1),
+            nn.BatchNorm2d(256, eps=1e-6, momentum=0.05),
+            nn.ReLU(inplace=True),
+            nn.MaxPool2d(3, 2),
+            # conv3
+            nn.Conv2d(256, 512, 3, 1),
+            nn.BatchNorm2d(512, eps=1e-6, momentum=0.05),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 512, 3, 1),
+            nn.BatchNorm2d(512, eps=1e-6, momentum=0.05),
+            nn.ReLU(inplace=True),
+            nn.Conv2d(512, 384, 3, 1),
+
+            )
 
         # conv1
         self.layer1 =nn.Sequential(
@@ -48,7 +80,8 @@ class SiamFC(nn.Module):
         self.MaxPool =nn.Sequential(
                 nn.MaxPool2d(kernel_size=2, stride=2))
         
-      
+        self.KSL =nn.Sequential(
+                nn.Conv2d(256, 256, 7, 1, groups=2))
         self.Conv1_1 =nn.Sequential(
                 nn.Conv2d(96, 256, 9, 1, groups=2),
                 nn.BatchNorm2d(256))
@@ -57,22 +90,47 @@ class SiamFC(nn.Module):
                 nn.Conv2d(384, 256, 5, 1, groups=2),
                 nn.BatchNorm2d(256))	
 			
+        self.nnorm=nn.BatchNorm2d(256, eps=1e-6, momentum=0.05)
+		
         self.conv_se = nn.Sequential(
                 nn.Conv2d(features, features//r, 1, padding=0, bias=True),
                 nn.ReLU(inplace=True)
         )
-       
+        self.conv1 = nn.Conv2d(channel, features, 3, padding=1, bias=True)
+        self.conv2 = nn.Conv2d(channel, features, 3, padding=2, dilation=2, bias=True,groups=2)
+        self.conv3 = nn.Conv2d(channel, features, 3, padding=3, dilation=3, bias=True,groups=2)
+        
         self.conv_ex = nn.Sequential(nn.Conv2d(features//r, features, 1, padding=0, bias=True))
         self.gap_1 = nn.AdaptiveAvgPool2d(1)
-
-       
+#        self.stage_1 = nn.Sequential(
+#                SKUnit(64, 256, 32, 2, 8, 2, stride=2),
+#                nn.ReLU())
+        d = max(int(features/r), L)
+        self.M = M
+        self.d = d
+        self.features = features
+        self.convs = nn.ModuleList([])
+        for i in range(M):
+            self.convs.append(nn.Sequential(
+                nn.Conv2d(features, features, kernel_size=3+i*2, stride=1, padding=1+i, groups=G),
+                nn.BatchNorm2d(features),
+                nn.ReLU(inplace=True)
+            ))
+        self.gap = nn.AvgPool2d(WH)
+        self.fc = nn.Linear(features, d)
+        self.softmax = nn.Softmax(dim=1)
+        self.fcs = nn.ModuleList([])
+        for i in range(M):
+            self.fcs.append(
+                nn.Linear(d, features)
+            )
         # adjust layer as in the original SiamFC in matconvnet
         self.adjust = nn.Conv2d(1, 1, 1, 1)
         self.sigmoid = nn.Sigmoid()
 
 
         self._initialize_weights()
-   
+
     def learn_z_cat(self, template):
         
         z1 = self.layer1(template) 
@@ -93,7 +151,7 @@ class SiamFC(nn.Module):
         features = torch.cat([z1_1, z3_1 , z5], dim=1)
 
         feas = torch.cat([z1_1.clone().unsqueeze(dim=1), z3_1.clone().unsqueeze(dim=1), z5.clone().unsqueeze(dim=1)], dim=1)
-       
+
         U = torch.sum(feas.clone(), dim=1)
         S = self.gap_1(U)
         Z = self.conv_se(S)
@@ -128,14 +186,14 @@ class SiamFC(nn.Module):
 
     def forward(self, z, x):
 
- 
+
         z1_1, z3_1 , z5 = self.learn_z_cat(z)
         z_feat = self.learn_att_z(z1_1, z3_1 , z5)
         x_feat = self.learn_x(x)
 
         # fast cross correlation
         out = self.fast_cross(x_feat, z_feat, "out", 0.1)
-        
+       
 
         # adjust the scale of responses
         out = 0.001 * out + 0.0
@@ -260,7 +318,8 @@ class TrackerSiamFC(Tracker):
             pad_color=self.avg_color)
 
         # exemplar features
-        exemplar_image = torch.from_numpy(exemplar_image).to(self.device).permute([2, 0, 1]).unsqueeze(0).float()
+        exemplar_image = torch.from_numpy(exemplar_image).to(
+            self.device).permute([2, 0, 1]).unsqueeze(0).float()
         with torch.set_grad_enabled(False):
             self.net.eval()
             z1_1, z3_1 , z5 = self.net.learn_z_cat(exemplar_image)
