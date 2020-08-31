@@ -37,7 +37,7 @@ python3 test.py
 
 ## Results - 
 **OTB2015**
-![img2](![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/overall_2015.png))
+![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/overall_2015.png)
 
 
 ## Citing
