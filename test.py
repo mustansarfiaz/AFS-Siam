@@ -11,9 +11,9 @@ if __name__ == '__main__':
     name = 'OTB'
     epoch_num = 50
     # training loop
-    for epoch in range(40, epoch_num):
-        result_dir=os.path.join('results/Siamatt_train0/SiamFC_Epoc_0_{}'.format(epoch + 1))
-        report_dir=os.path.join('reports/Siamatt_train0/SiamFC_Epoc_0_{}'.format(epoch + 1))
+    for epoch in range(17, epoch_num):
+        result_dir=os.path.join('results/AFS_Siam/SiamFC_Epoc_0_{}'.format(epoch + 1))
+        report_dir=os.path.join('reports/AFS_Siam/SiamFC_Epoc_0_{}'.format(epoch + 1))
         experiments = ExperimentOTB(config.root_dir_for_OTB, version=2015, 
                                     result_dir=result_dir , report_dir = report_dir)
 #
