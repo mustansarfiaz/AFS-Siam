@@ -5,7 +5,7 @@ This is my project in the direction of Visual Object Tracking.
 Paper: Adaptive Feature Selection Siamese Networks for Visual Tracking
 
 **AFS-Siam architecture**
-![pdf1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS.pdf)
+![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS_Framework.png)
 
 ## How to Run - Training
 1. **Prerequisites:** The project was built using **python 3.7** and tested on Ubuntu 18.04. It was tested on a **NVIDIA GeForce GTX 1080**. Furthermore it requires [PyTorch 1.0 or more](https://pytorch.org/).
@@ -37,7 +37,7 @@ python3 test.py
 
 ## Results - 
 **OTB2015**
-![pdf2](![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS.pdf))
+![img2](![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/overall_2015.png))
 
 
 ## Citing
