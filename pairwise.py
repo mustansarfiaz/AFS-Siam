@@ -80,49 +80,17 @@ class Pairwise(Dataset):
         exemplar_img = self._crop_and_resize(exemplar_image, anno[rand_z])
         exemplar_image = 255.0 * self.transform_z(exemplar_img)
 
-#        exemplar_noise = self.sp_noise(exemplar_img, 0.05)
-#        exemplar_noise = 255.0 * self.transform_z(exemplar_noise)
 
         instance_image = Image.open(img_files[rand_x])
         instance_img = self._crop_and_resize(instance_image, anno[rand_x])
         instance_image = 255.0 * self.transform_x(instance_img)
 
-#        instance_noise = self.sp_noise(instance_img, 0.05)
-#        instance_noise = 255.0 * self.transform_x(instance_noise)
-#        
-#        
-#        plt.imshow(exemplar_noise.permute(1, 2, 0).numpy())
-#        plt.show()
-#        plt.imshow(instance_noise.permute(1, 2, 0).numpy())
-#        plt.show()
-
-        #return exemplar_image, exemplar_noise, instance_image, instance_noise
         return exemplar_image,  instance_image
 
     def __len__(self):
         return self.cfg.pairs_per_seq * len(self.seq_dataset)
 
-    def sp_noise(self, image, prob):
-        '''
-        Add salt and pepper noise to image
-        prob: Probability of the noise
-        '''
-        image = np.array(image)
-        output = np.zeros(image.shape,np.uint8)
-        thres = 1 - prob
-        for i in range(image.shape[0]):
-            for j in range(image.shape[1]):
-                rdn = random.random()
-                if rdn < prob:
-                    output[i][j] = 0
-                elif rdn > thres:
-                    output[i][j] = 255
-                else:
-                    output[i][j] = image[i][j]
-        cv2.imwrite("cv.png", output)
-        output = Image.fromarray(output)
-        return output
-
+    
     def _sample_pair(self, n):
         assert n > 0
         if n == 1:
