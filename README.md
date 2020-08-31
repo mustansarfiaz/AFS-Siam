@@ -3,13 +3,7 @@
 This is my project in the direction of Visual Object Tracking.
 
 **SCS-Siam architecture**
-<center>
-    <figure>
-        <figcaption>
-            <img src="framework/SiamFusion.png" height="10%" width="60%">
-        </figcaption>
-    </figure>
-</center>
+![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS.pdf)
 
 ## How to Run - Training
 1. **Prerequisites:** The project was built using **python 3.7** and tested on Ubuntu 18.04. It was tested on a **NVIDIA GeForce GTX 1080**. Furthermore it requires [PyTorch 1.0 or more](https://pytorch.org/).
@@ -41,13 +35,8 @@ python3 test.py
 
 ## Results - 
 **OTB2015**
-<center>
-    <figure>
-        <figcaption>
-            <img src="framework/result_otb.jpg" height="60%" width="100%">
-        </figcaption>
-    </figure>
-</center>
+![img1](![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS.pdf))
+
 
 ## Citing
 ```
