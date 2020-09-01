@@ -2,7 +2,7 @@
 ## Introduction
 This is my project in the direction of Visual Object Tracking.
 
-Paper: Adaptive Feature Selection Siamese Networks for Visual Tracking
+[Paper](https://link.springer.com/chapter/10.1007/978-981-15-4818-5_13): Adaptive Feature Selection Siamese Networks for Visual Tracking
 
 **AFS-Siam architecture**
 ![img1](https://github.com/mustansarfiaz/AFS-Siam/blob/master/framework/AFS_Framework.png)
